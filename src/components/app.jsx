@@ -21,16 +21,13 @@ import {
   BlockFooter,
 } from "framework7-react";
 
-import {
-  getUser,
-  removeUserStorage,
-  setUserStorage,
-} from "../constants/user";
+import { getUser, removeUserStorage, setUserStorage } from "../constants/user";
 import UserService from "../service/user.service";
 import { setNotiID, getNotiID } from "./../constants/user";
 
 import routes from "../js/routes";
 import { NAME_APP } from "../constants/config";
+import { CLOSE_APP } from "../constants/prom21";
 
 export default class extends React.Component {
   constructor() {
@@ -66,11 +63,10 @@ export default class extends React.Component {
         view: {
           allowDuplicateUrls: true,
           routesBeforeEnter: function (to, from, resolve, reject) {
-            //console.log("All Page resolve + App.jsx");
             resolve();
           },
         },
-      },
+      }
     };
   }
   render() {
@@ -105,16 +101,18 @@ export default class extends React.Component {
     this.$f7.views.main.router.navigate(`/voucher/`);
   };
 
+  ToBackBrowser = () => {
+    const { history } = this.$f7.views.main.router;
+    if (history.length === 1 && history[0] === "/") {
+      CLOSE_APP();
+    } else {
+      this.$f7.views.main.router.back();
+    }
+  };
+
   componentDidMount() {
-    var $$ = this.Dom7;
-    //$$("#preload").remove();
     window.percent = 99;
     window.APP_READY = true;
-    // const self = this;
-    // self.$f7.dialog.preloader('Loading ...');
-    // setTimeout(() => {
-    //   self.$f7.dialog.close();
-    // }, 2000);
     document.body.addEventListener("noti_click.go_noti", this.notiDefault);
     document.body.addEventListener("noti_click.prod_id", this.notiProdID);
     document.body.addEventListener("noti_click.art_id", this.notiArtID);
@@ -123,6 +121,7 @@ export default class extends React.Component {
       this.notiCateProdID
     );
     document.body.addEventListener("noti_click.voucher_id", this.notiVoucher);
+    window.ToBackBrowser = this.ToBackBrowser;
   }
 
   componentWillUnmount() {
